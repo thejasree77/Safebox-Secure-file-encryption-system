@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+
+.env
+secret.key
+*.key
+*.pem
+
+database.db
+
+storage
+storage_backup
+
+.vscode/

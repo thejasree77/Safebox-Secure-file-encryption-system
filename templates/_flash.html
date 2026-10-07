@@ -1,0 +1,3 @@
+{% for cat, m in get_flashed_messages(with_categories=true) %}
+<div class="flash {{ cat }}">{{ m }}</div>
+{% endfor %}

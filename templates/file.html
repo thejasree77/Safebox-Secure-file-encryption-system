@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% from "_macros.html" import tamper_card %}
+{% block title %}{{ f.filename }} · SafeBox{% endblock %}
+{% block content %}
+<p class="sm"><a href="{{ url_for('files') }}">← My files</a></p>
+<div class="row-between">
+  <h1>📄 {{ f.filename }}</h1>
+  <div class="actions">
+    <a class="btn" href="{{ url_for('decrypt', file=f.id) }}">🔓 Unlock</a>
+    {% if is_owner %}<a class="btn ghost" href="{{ url_for('secure_share', file=f.id) }}">🔗 Share with a link</a>{% endif %}
+  </div>
+</div>
+<p class="muted">{{ f.size|size }} · owned by {{ f.owner }} · locked {{ f.uploaded_at|ist }}</p>
+
+{% if status != 'VERIFIED' %}{{ tamper_card(f.filename, status) }}{% endif %}
+
+<div class="card">
+  <h3>File details</h3>
+  <div class="mono">{{ f.filename }}.enc</div>
+  <div class="kv"><span>Encryption</span><b>AES-256 <span class="good">✓</span></b></div>
+  <div class="kv"><span>Change check</span><b>SHA-256 <span class="{{ 'good' if status == 'VERIFIED' else 'badtxt' }}">{{ '✓' if status == 'VERIFIED' else '✕' }}</span></b></div>
+  <div class="kv"><span>Status</span><span class="badge {{ 'green' if status == 'VERIFIED' else 'red' }}">● {{ status|nice }}</span></div>
+  <div class="kv"><span>Fingerprint</span><code>{{ f.cipher_sha256[:24] }}…</code></div>
+</div>
+
+{% if is_owner %}
+<div class="grid2">
+  <div class="card">
+    <h3>Share with a user</h3>
+    <form method="post" action="{{ url_for('share_user', fid=f.id) }}" class="inline">
+      {{ csrf_field() }}
+      <input name="recipient" placeholder="Username" required>
+      <button class="btn">Share</button>
+    </form>
+    <p class="note">They also need the file password. Send it to them privately.</p>
+    {% if people %}
+    <div class="label sm muted">People with access</div>
+    <div class="chips">
+      {% for p in people %}
+      <form method="post" action="{{ url_for('revoke_user', fid=f.id, uid=p.id) }}">{{ csrf_field() }}<button class="chip-btn" title="Remove access">{{ p.username }} ✕</button></form>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+  <div class="card">
+    <h3>Delete file</h3>
+    <p class="muted sm">Removes the locked file, all user access and {{ links }} active link{{ '' if links == 1 else 's' }}. This cannot be undone.</p>
+    <form method="post" action="{{ url_for('delete_file', fid=f.id) }}" onsubmit="return confirm('Delete this file for good?')">
+      {{ csrf_field() }}
+      <button class="btn danger">🗑 Delete file</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Share Links · SafeBox{% endblock %}
+{% block content %}
+<h1>Share links</h1>
+<p class="muted lead">Pick one or more files and make a link. The link needs a password, stops working after a set time and limits downloads.</p>
+
+{% macro link_card(l) %}
+<div class="linkcard">
+  <div class="row-between"><b>🔗 {{ l.files|length }} file{{ '' if l.files|length == 1 else 's' }}</b>
+    <span class="badge {{ {'Active':'green','Expired':'grey','Revoked':'grey','Locked':'red','Limit reached':'amber'}[l.state] }}">● {{ l.state }}</span></div>
+  <ul class="flist">{% for f in l.files %}<li>📄 {{ f.filename }} <span class="muted sm">{{ f.size|size }}</span></li>{% endfor %}</ul>
+  <div class="keyrow"><input readonly value="{{ l.url }}" id="url{{ l.id }}"><button type="button" class="btn ghost" data-copy-from="url{{ l.id }}">Copy link</button></div>
+  <div class="kv"><span>{{ 'Ends in' if l.state == 'Active' else 'Ended' }}</span><b>{{ l.expires_at|remaining if l.state == 'Active' else l.expires_at|ist }}</b></div>
+  <div class="kv"><span>Downloads</span><b>{{ l.downloads }} / {{ l.max_downloads }}</b></div>
+  <div class="kv"><span>Password needed</span><b class="good">✓ Yes</b></div>
+  <div class="kv"><span>Auto-delete</span><b>{% if l.destroy_on_expiry or l.destroy_on_first %}{{ 'When the link ends' if l.destroy_on_expiry }}{{ ' · ' if l.destroy_on_expiry and l.destroy_on_first }}{{ 'After first download' if l.destroy_on_first }}{% else %}Off{% endif %}</b></div>
+  {% if l.state == 'Active' %}
+  <form method="post" action="{{ url_for('revoke_link', sid=l.id) }}" onsubmit="return confirm('Turn off this link?')">{{ csrf_field() }}<button class="btn danger sm">Turn off link</button></form>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% if new %}
+<div class="card success">
+  <h3>✓ Share link created</h3>
+  {{ link_card(new) }}
+  <p class="note">Send the link and its password in different messages. For example, the link by email and the password by phone.</p>
+</div>
+{% endif %}
+
+<div class="grid2 top-align">
+  <div class="card">
+    <h3>Make a link</h3>
+    {% if not files %}
+    <p class="muted">You need a locked file first.</p><a class="btn" href="{{ url_for('encrypt') }}">Lock a file</a>
+    {% else %}
+    <form method="post" action="{{ url_for('create_link') }}">
+      {{ csrf_field() }}
+      <label>1. Choose files</label>
+      <div class="picklist">
+        <label class="opt all"><input type="checkbox" id="allfiles"> Select all</label>
+        {% for f in files %}
+        <div class="pick">
+          <label class="opt"><input type="checkbox" name="file_ids" value="{{ f.id }}" {{ 'checked' if f.id == selected }}> 📄 {{ f.filename }} <span class="muted sm">{{ f.size|size }}</span></label>
+          {% if not f.owner_wrapped %}<input type="password" name="pw_{{ f.id }}" placeholder="Password of this file (asked only once)" autocomplete="off">{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+
+      <label>2. Link rules</label>
+      <div class="two">
+        <div><select name="expiry">{% for h, t in expiry.items() %}<option value="{{ h }}" {{ 'selected' if h == 24 }}>Ends after {{ t }}</option>{% endfor %}</select></div>
+        <div><input type="number" name="limit" value="3" min="1" max="50" title="Download limit"></div>
+      </div>
+      <div class="muted sm">Left: how long the link works. Right: how many times it can be used.</div>
+
+      <label>3. Link password</label>
+      <label class="opt"><input type="radio" name="lpmode" value="gen" checked> Make a password for me <span class="muted">(recommended)</span></label>
+      <label class="opt"><input type="radio" name="lpmode" value="own"> I'll type my own</label>
+      <div class="keyrow">
+        <input name="link_password" id="lpw" minlength="6" autocomplete="off" required>
+        <button type="button" class="btn ghost" id="lgen">New password</button>
+      </div>
+      <div class="keymeta">
+        <span class="muted">Copy it now. It is not saved.</span>
+        <span><button type="button" class="linkbtn" data-copy-from="lpw">Copy password</button> · <button type="button" class="linkbtn" id="ldl">Download password</button></span>
+      </div>
+
+      <div class="selfd">
+        <b>💥 Auto-delete</b>
+        <label class="opt"><input type="checkbox" name="destroy_expiry"> Delete the files when the link ends</label>
+        <label class="opt"><input type="checkbox" name="destroy_first"> Delete the files after the first download</label>
+        <p class="note">⚠ Deleted files cannot come back. Copies people already downloaded stay with them.</p>
+      </div>
+      <button class="btn block" id="mk" disabled>Create link</button>
+    </form>
+    {% endif %}
+  </div>
+
+  <div>
+    {% set others = links|rejectattr('id', 'equalto', new.id if new else 0)|list %}
+    {% if others %}<h3 class="plain">Your links</h3>{% endif %}
+    {% for l in others %}
+    <div class="card">{{ link_card(l) }}</div>
+    {% endfor %}
+    {% if not links %}<div class="card"><p class="muted">No links yet. Make one to share files with anyone, even without an account.</p></div>{% endif %}
+  </div>
+</div>
+{% endblock %}

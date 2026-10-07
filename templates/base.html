@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}SafeBox{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script src="{{ url_for('static', filename='theme.js') }}"></script>
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <a class="logo" href="{{ url_for('dashboard') }}"><span class="mark">◈</span> SAFEBOX</a>
+    <nav>
+      {% set nav = [('dashboard','🏠','Home'),('encrypt','🔒','Lock a file'),('decrypt','🔓','Unlock a file'),
+                    ('files','📁','My Files'),('secure_share','🔗','Share Links'),('events','📋','Activity')] %}
+      {% for ep, icon, name in nav %}
+      <a href="{{ url_for(ep) }}" class="{{ 'on' if request.endpoint == ep or (ep == 'files' and request.endpoint == 'file_detail') }}"><span class="ico">{{ icon }}</span>{{ name }}</a>
+      {% endfor %}
+    </nav>
+    <a class="settings {{ 'on' if request.endpoint == 'settings' }}" href="{{ url_for('settings') }}"><span class="ico">⚙</span>Settings</a>
+  </aside>
+  <div class="main">
+    <header class="top">
+      <span class="muted">👤 {{ session.username }}</span>
+      <select id="theme" aria-label="Theme">
+        <option value="ocean">🌊 Ocean</option>
+        <option value="forest">🌿 Forest</option>
+        <option value="sunset">🌅 Sunset</option>
+        <option value="grape">🍇 Grape</option>
+        <option value="rose">🌸 Rose</option>
+        <option value="night">🌙 Night</option>
+      </select>
+      <span class="pill {{ 'warn' if alert else 'ok' }}">● {{ 'Needs attention' if alert else 'All safe' }}</span>
+      <a class="btn ghost sm" href="{{ url_for('logout') }}">Log out</a>
+    </header>
+    <main class="content">
+      {% include "_flash.html" %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Settings · SafeBox{% endblock %}
+{% block content %}
+<h1>Settings</h1>
+<div class="grid2 top-align">
+  <div class="card">
+    <h3>Your account</h3>
+    <div class="kv"><span>Username</span><b>{{ session.username }}</b></div>
+    <div class="kv"><span>Password is stored as</span><b>A scrambled hash</b></div>
+    <div class="kv"><span>Your private key</span><b>RSA-2048, locked</b></div>
+    <div class="kv"><span>Time zone</span><b>IST (UTC+05:30)</b></div>
+  </div>
+  <div class="card">
+    <h3>Change password</h3>
+    <form method="post">
+      {{ csrf_field() }}
+      <label>Current password</label><input type="password" name="old" autocomplete="current-password" required>
+      <label>New password</label><input type="password" name="new" minlength="8" autocomplete="new-password" required>
+      <label>Confirm new password</label><input type="password" name="confirm" minlength="8" autocomplete="new-password" required>
+      <button class="btn block">Save password</button>
+    </form>
+  </div>
+</div>
+<div class="card">
+  <h3>🎨 Theme</h3>
+  <p class="muted sm">Pick the colours you like. Your choice is remembered in this browser.</p>
+  <div class="swatches">
+    <button type="button" class="swatch" data-theme-set="ocean"><i style="background:#4F7DF3"></i>Ocean</button>
+    <button type="button" class="swatch" data-theme-set="forest"><i style="background:#2E9E6B"></i>Forest</button>
+    <button type="button" class="swatch" data-theme-set="sunset"><i style="background:#F08A3C"></i>Sunset</button>
+    <button type="button" class="swatch" data-theme-set="grape"><i style="background:#7C5CE6"></i>Grape</button>
+    <button type="button" class="swatch" data-theme-set="rose"><i style="background:#E0527E"></i>Rose</button>
+    <button type="button" class="swatch" data-theme-set="night"><i style="background:#182236"></i>Night (dark)</button>
+  </div>
+</div>
+{% endblock %}

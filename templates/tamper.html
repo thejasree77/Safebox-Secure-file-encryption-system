@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% from "_macros.html" import tamper_card %}
+{% block title %}File was changed · SafeBox{% endblock %}
+{% block content %}
+<div class="narrow">
+  {{ tamper_card(f.filename, status) }}
+  <div class="center"><a class="btn ghost" href="{{ url_for('files') }}">Back to my files</a>
+  <a class="btn ghost" href="{{ url_for('events') }}">See activity</a></div>
+</div>
+{% endblock %}

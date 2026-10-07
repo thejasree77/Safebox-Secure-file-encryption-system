@@ -1,0 +1,26 @@
+{% macro timeline(rows) %}
+<ul class="timeline">
+  {% for e in rows %}
+  <li class="{{ e.severity }}">
+    <span class="dot"></span>
+    <div>
+      <div class="t-head"><b>{{ e.action|label }}</b><span class="muted sm">{{ e.ts|ist("%d %b, %I:%M %p") }}</span></div>
+      {% if e.detail %}<div class="muted sm">{{ e.detail }}</div>{% endif %}
+    </div>
+  </li>
+  {% else %}
+  <li class="empty muted">Nothing has happened yet.</li>
+  {% endfor %}
+</ul>
+{% endmacro %}
+
+{% macro tamper_card(name, status) %}
+<div class="tamper">
+  <div class="tamper-title">🚨 {{ 'File is missing' if status == 'MISSING' else 'File was changed' }}</div>
+  <div class="mono">{{ name }}.enc</div>
+  <p>{% if status == 'MISSING' %}The locked file is no longer in storage.{% else %}Someone or something changed this file after it was locked.{% endif %}</p>
+  <div class="kv"><span>When it was locked</span><b>Safe</b></div>
+  <div class="kv"><span>Now</span><b class="bad">{{ 'Missing' if status == 'MISSING' else 'Changed' }}</b></div>
+  <div class="kv"><span>Unlocking</span><b class="bad">Blocked 🔒</b></div>
+</div>
+{% endmacro %}

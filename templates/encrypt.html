@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Lock a file · SafeBox{% endblock %}
+{% block content %}
+<div class="narrow">
+  <h1 class="center">Lock a file</h1>
+  <p class="muted center lead">Protect your file with strong encryption (AES-256).</p>
+
+  <form method="post" enctype="multipart/form-data" id="encForm">
+    {{ csrf_field() }}
+    <div class="drop" id="drop">
+      <div class="cloud">☁️</div>
+      <b>Drop your file here</b>
+      <span class="muted">or choose it from your computer</span>
+      <button type="button" class="btn" id="browse">Choose a file</button>
+      <input type="file" name="file" id="file" hidden>
+    </div>
+    <div class="filecard" id="fileCard" hidden>
+      <span>📄 <b id="fName"></b></span><span class="muted" id="fSize"></span>
+    </div>
+
+    <div class="card">
+      <h3>File password</h3>
+      <label class="opt"><input type="radio" name="mode" value="gen" checked> Make a password for me <span class="muted">(recommended)</span></label>
+      <label class="opt"><input type="radio" name="mode" value="pw"> I'll type my own password</label>
+      <div class="keyrow">
+        <input id="secret" name="secret" autocomplete="off" readonly>
+        <button type="button" class="btn ghost" id="gen">New password</button>
+        <button type="button" class="btn ghost" id="toggle" hidden>Show</button>
+      </div>
+      <div class="keymeta">
+        <span id="keyStatus" class="muted">Password check: not ready</span>
+        <span><button type="button" class="linkbtn" id="copy">Copy password</button> · <button type="button" class="linkbtn" id="dl">Download password</button></span>
+      </div>
+      <p class="note">⚠ Save this password now. SafeBox does not keep a copy.</p>
+    </div>
+
+    <div class="card">
+      <h3>Share with other users <span class="muted">(optional)</span></h3>
+      <input name="recipients" placeholder="Usernames, separated by commas">
+    </div>
+
+    <div class="center"><button class="btn lg" id="go" disabled>🔒 Lock file</button></div>
+  </form>
+</div>
+{% endblock %}

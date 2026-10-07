@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Unlock a file · SafeBox{% endblock %}
+{% block content %}
+<div class="narrow">
+  <h1 class="center">Unlock a file</h1>
+  <p class="muted center lead">Enter the password you set when you locked the file.</p>
+  {% if not files %}
+  <div class="card center"><p class="muted">You have no files yet.</p><a class="btn" href="{{ url_for('encrypt') }}">Lock a file</a></div>
+  {% else %}
+  <form method="post">
+    {{ csrf_field() }}
+    <div class="card">
+      <label>File</label>
+      <select name="file_id">
+        {% for f in files %}
+        <option value="{{ f.id }}" {{ 'selected' if f.id == selected }}>{{ f.filename }} ({{ f.size|size }}, from {{ f.owner }})</option>
+        {% endfor %}
+      </select>
+      <label>Password</label>
+      <div class="keyrow">
+        <input type="password" name="secret" id="dsecret" placeholder="Type or paste the password" autocomplete="off" required>
+        <button type="button" class="btn ghost" data-toggle="dsecret">Show</button>
+      </div>
+      <p class="note">🛡 SafeBox checks that the file was not changed before unlocking it.</p>
+    </div>
+    <div class="center"><button class="btn lg">🔓 Unlock and download</button></div>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

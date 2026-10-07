@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "_macros.html" import tamper_card %}
+{% block title %}My Files · SafeBox{% endblock %}
+{% block content %}
+<div class="row-between"><h1>My files</h1><a class="btn" href="{{ url_for('encrypt') }}">+ Lock a file</a></div>
+{% for f in bad %}{{ tamper_card(f.filename, f.status) }}{% endfor %}
+<div class="card flush">
+  {% if not files %}
+  <p class="muted pad">You have no files yet. Lock your first file to get started.</p>
+  {% else %}
+  <div class="scroll"><table>
+    <tr><th>File</th><th>Owner</th><th>Size</th><th>Locked on</th><th>Status</th><th></th></tr>
+    {% for f in files %}
+    <tr>
+      <td>📄 <a href="{{ url_for('file_detail', fid=f.id) }}">{{ f.filename }}</a></td>
+      <td>{{ f.owner }} <span class="badge {{ 'blue' if f.owner_id == session.user_id else 'grey' }}">{{ 'You' if f.owner_id == session.user_id else 'Shared with you' }}</span></td>
+      <td>{{ f.size|size }}</td>
+      <td>{{ f.uploaded_at|ist }}</td>
+      <td><span class="badge {{ 'green' if f.status == 'VERIFIED' else 'red' }}">● {{ f.status|nice }}</span></td>
+      <td class="right"><a class="btn ghost sm" href="{{ url_for('decrypt', file=f.id) }}">Unlock</a></td>
+    </tr>
+    {% endfor %}
+  </table></div>
+  {% endif %}
+</div>
+{% endblock %}

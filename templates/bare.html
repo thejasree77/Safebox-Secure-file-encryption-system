@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}SafeBox{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script src="{{ url_for('static', filename='theme.js') }}"></script>
+</head>
+<body class="bare">
+<div class="bare-wrap">
+  <div class="bare-brand"><span class="mark">◈</span> SAFEBOX</div>
+  {% include "_flash.html" %}
+  {% block content %}{% endblock %}
+  <p class="muted sm center foot">Protected with AES-256 and RSA-2048 encryption. Times are shown in IST.</p>
+</div>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% from "_macros.html" import timeline %}
+{% block title %}Home · SafeBox{% endblock %}
+{% block content %}
+<h1>Welcome back 👋</h1>
+<p class="muted lead">{{ 'One of your files needs attention.' if alert else 'Your files are safe.' }}</p>
+
+<div class="grid3">
+  <div class="card stat"><span class="chip">🔒</span><div><b>{{ encrypted }}</b><span class="muted">Locked files</span></div></div>
+  <div class="card stat"><span class="chip">🔗</span><div><b>{{ active_links }}</b><span class="muted">Share links in use</span></div></div>
+  <div class="card stat"><span class="chip">🛡</span><div><b>{{ score }}%</b><span class="muted">Safety score</span></div></div>
+</div>
+
+<div class="grid2">
+  <a class="drop link-drop" href="{{ url_for('encrypt') }}">
+    <div class="cloud">☁️</div>
+    <b>Lock a file</b>
+    <span class="muted">Pick a file and protect it with a password</span>
+    <span class="btn">Choose a file</span>
+  </a>
+  <div class="card advisor">
+    <h3>🛡 Safety check</h3>
+    <div class="scorebar"><div class="bar"><i style="width: {{ score }}%"></i></div><b>{{ score }}%</b></div>
+    <ul class="checks">
+      {% for ok, good, bad, w in checks %}
+      <li class="{{ 'ok' if ok else 'warn' }}">{{ '✓' if ok else '⚠' }} {{ good if ok else bad }}</li>
+      {% endfor %}
+    </ul>
+    <details class="recs">
+      <summary class="btn ghost sm">View recommendations</summary>
+      <ul>
+        {% for ok, good, bad, w in checks %}{% if not ok %}<li>⚠ {{ bad }}</li>{% endif %}{% endfor %}
+        {% if score == 100 %}<li>✓ Everything looks good. Keep it up!</li>{% endif %}
+        <li>Send a share link and its password in two different messages.</li>
+        <li>Use a different password for every file.</li>
+        <li>Delete files you no longer need.</li>
+      </ul>
+    </details>
+  </div>
+</div>
+
+<div class="card">
+  <div class="row-between"><h3>📋 Recent activity</h3><a class="sm" href="{{ url_for('events') }}">See all</a></div>
+  {{ timeline(events) }}
+</div>
+{% endblock %}

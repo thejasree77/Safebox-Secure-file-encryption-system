@@ -1,0 +1,20 @@
+{% extends "bare.html" %}
+{% block title %}Create account · CryptoVault{% endblock %}
+{% block content %}
+<div class="card auth">
+  <h1>Create your vault</h1>
+  <p class="muted">
+  <form method="post">
+    {{ csrf_field() }}
+    <label>Username</label>
+    <input name="username" minlength="3" autocomplete="username" required autofocus>
+    <label>Password</label>
+    <input type="password" name="password" minlength="8" autocomplete="new-password" required>
+    <label>Confirm password</label>
+    <input type="password" name="confirm" minlength="8" autocomplete="new-password" required>
+    <button class="btn block">Create account</button>
+  </form>
+  <p class="note">
+  <p class="muted center sm">Already registered? <a href="{{ url_for('login') }}">Sign in</a></p>
+</div>
+{% endblock %}
